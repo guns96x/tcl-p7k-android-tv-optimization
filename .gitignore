@@ -7,3 +7,6 @@
 *.jpg
 *.tmp
 *.log
+
+# Local device snapshots (may contain private TorrServer settings)
+state/
