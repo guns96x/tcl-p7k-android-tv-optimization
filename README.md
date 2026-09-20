@@ -58,12 +58,12 @@ To liberate physical memory for 4K video decoders and TorrServer, 28 non-essenti
 - `com.tcl.tv.tclhome_passive`: TCL Home background sync.
 - `com.tcl.channelplus`: TCL TV+ ad channels and live stream pusher.
 - `com.tcl.smartalexa`: Alexa integration service.
-- `com.tcl.dashboard`, `com.tcl.messagebox`, `com.tcl.suspension`: Floating widgets and sidebars.
+- `com.tcl.messagebox`: Floating notification service.
 - `com.tcl.waterfall.overseas`: Content feed aggregator.
 - `com.tcl.browser`: TCL preinstalled web browser.
 - `com.tcl.esticker` & `com.tcl.exhibit`: Store retail demonstration apps.
 - `com.tcl.ocean.instructions` & `com.tcl.repairguide`: Manuals and guides.
-- `com.tcl.gamebar`, `com.tcl.t_solo`, `com.tcl.interactive`, `com.tcl.magiconnectfree`.
+- `com.tcl.t_solo`, `com.tcl.interactive`, `com.tcl.magiconnectfree`.
 
 ### D. Unused Android System Services
 - `com.android.printspooler`: Print spooler service (unneeded on TV).
@@ -74,7 +74,12 @@ To liberate physical memory for 4K video decoders and TorrServer, 28 non-essenti
 ### E. Preserved Essential Features
 - **Netflix (`com.netflix.ninja`)**: Untouched; full 4K HDR & Dolby Vision support preserved.
 - **Voice Search (`com.google.android.katniss` + `com.google.android.tts`)**: Remote microphone search remains 100% operational.
-- **Core TV Inputs (`com.tcl.tv`, `com.tcl.tvinput`)**: HDMI and tuner inputs fully operational.
+- **Core TV Inputs & Remote HDMI Switcher**:
+  - `com.tcl.tv` & `com.tcl.tvinput`: Core TV tuner and HDMI pass-through services.
+  - `com.tcl.suspension` (`Quick_Panel.apk`): Provides the physical remote's Source / Inputs overlay menu (`InputActivity` / `com.android.tv.action.VIEW_INPUTS`).
+  - `com.tcl.dashboard`: Side settings / inputs dashboard overlay.
+  - `com.tcl.gamebar`: Game Master overlay bar for HDMI gaming sources.
+  - `com.tcl.guard`: Required system permissions for HDMI-CEC active source switching.
 
 ---
 

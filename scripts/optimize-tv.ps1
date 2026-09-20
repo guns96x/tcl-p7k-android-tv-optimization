@@ -51,9 +51,10 @@ $tclBloat = @(
     "com.tcl.tv.tclhome_passive",
     "com.tcl.channelplus",
     "com.tcl.smartalexa",
-    "com.tcl.dashboard",
+    # NOTE: com.tcl.suspension (Quick_Panel), com.tcl.dashboard, com.tcl.gamebar,
+    # and com.tcl.guard are intentionally PRESERVED: they provide the physical remote's
+    # Source / HDMI input switcher menu and CEC switching.
     "com.tcl.messagebox",
-    "com.tcl.suspension",
     "com.tcl.waterfall.overseas",
     "com.tcl.magiconnectfree",
     "com.tcl.browser",
@@ -61,7 +62,6 @@ $tclBloat = @(
     "com.tcl.exhibit",
     "com.tcl.ocean.instructions",
     "com.tcl.repairguide",
-    "com.tcl.gamebar",
     "com.tcl.t_solo",
     "com.tcl.interactive",
     "com.tcl.partnercustomizer",
