@@ -64,7 +64,8 @@ ignored by Git.
 `configure-torrserver.ps1` reads and backs up the full settings object, changes
 the six cache-related fields plus `ResponsiveMode`, then verifies them. A real change makes
 TorrServer disconnect and reconnect torrent sessions, so run it when playback
-can be interrupted. If the requested values are already set, it makes no
+can be interrupted. The player may remain paused afterward; press Play to
+resume. If the requested values are already set, it makes no
 `action=set` request.
 
 ## Usage
@@ -91,6 +92,9 @@ because its selected target state was already present. The restore script
 restored `window_animation_scale` from a temporary `1.0` back to the snapshot
 value `0.5` and verified all recorded settings. TorrServer accepted the live
 change, remained reachable, and had local port 8090 connections afterward.
+The player was paused after the change; an ADB Play command resumed its
+MediaSession and refreshed the position near 45 minutes. Sustained playback
+and audio quality still require observation on the TV screen.
 No new 4K playback or before-and-after performance test was run here.
 
 TorrServer MatriX.141's [settings handler](https://github.com/YouROK/TorrServer/blob/MatriX.141/server/web/api/settings.go)
