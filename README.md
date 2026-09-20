@@ -30,13 +30,13 @@ Android's low-memory killer or guarantee that a player stays alive.
 
 The active TorrServer (`MatriX.141.Client`) reported an 80 MiB RAM cache,
 25% preload, 95% read-ahead, disk cache off, and a 30-peer limit. Its
-`ResponsiveMode` was false, although the MatriX.141 default is true. The older
+`ResponsiveMode` was initially false, although the MatriX.141 default is true. The older
 configuration script sent only part of TorrServer's settings object. TorrServer
 replaces the complete object on `action=set`, so that request could reset
 unmentioned fields. The revised script first reads the full object, changes
-only its requested fields, and sends the full object back. A read-only check
-confirmed that the cache values already match. Enabling `ResponsiveMode`
-is pending until playback can be interrupted.
+only its requested fields, and sends the full object back. The cache values
+already matched; the live update changed only `ResponsiveMode` to true. A
+comparison of all 37 returned fields with the backup found no other changes.
 
 The earlier report's 8–12 second startup and uninterrupted playback at 24:46
 were reported observations; this audit did not replay the film. Startup and
@@ -89,7 +89,8 @@ that the TorrServer script preserves unrelated fields and skips a repeat
 request. The optimizer completed against the connected TV without changes
 because its selected target state was already present. The restore script
 restored `window_animation_scale` from a temporary `1.0` back to the snapshot
-value `0.5` and verified all recorded settings.
+value `0.5` and verified all recorded settings. TorrServer accepted the live
+change, remained reachable, and had local port 8090 connections afterward.
 No new 4K playback or before-and-after performance test was run here.
 
 TorrServer MatriX.141's [settings handler](https://github.com/YouROK/TorrServer/blob/MatriX.141/server/web/api/settings.go)
