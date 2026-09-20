@@ -1,41 +1,58 @@
 <#
 .SYNOPSIS
-    TorrServer Configuration Script for Android TV (2GB RAM devices).
+    Apply TCL P7K TorrServer cache settings without discarding other settings.
 .DESCRIPTION
-    Applies high-speed RAM buffering (80MB cache, 25% preload = 20MB) to ensure instant
-    startup within 8-12 seconds and prevent LowMemoryKiller crashes during 4K streaming.
+    TorrServer treats action=set as a complete replacement. Read and back up the
+    current object, change only cache fields, then verify. A change restarts torrents.
 #>
 param(
-    [string]$TorrServerUrl = "http://192.168.0.22:8090"
+    [Parameter(Mandatory = $true)]
+    [ValidatePattern('^https?://[^/]+/?$')]
+    [string]$TorrServerUrl,
+    [string]$BackupDirectory = (Join-Path $PSScriptRoot '..\state')
 )
 
-Write-Host "Configuring TorrServer at $TorrServerUrl..." -ForegroundColor Cyan
-
-$payload = @{
-    action = "set"
-    sets = @{
-        UseDisk = $false
-        CacheSize = 83886080          # 80 MB RAM buffer
-        ReaderReadAHead = 95          # 95% lookahead
-        PreloadCache = 25             # 25% of 80MB = 20 MB (starts in 8-12s)
-        RemoveCacheOnDrop = $true
-        ConnectionsLimit = 30
-        DisableTCP = $false
-        DisableUTP = $false
-        DisablePEX = $false
-        DisableDHT = $false
-        DisableUpload = $false
-    }
-} | ConvertTo-Json -Depth 5
+$ErrorActionPreference = 'Stop'
+$settingsUrl = $TorrServerUrl.TrimEnd('/') + '/settings'
 
 try {
-    Invoke-RestMethod -Uri "$TorrServerUrl/settings" -Method Post -Body $payload -ContentType "application/json" -TimeoutSec 10
-    Write-Host "Successfully configured TorrServer!" -ForegroundColor Green
-    
-    $current = Invoke-RestMethod -Uri "$TorrServerUrl/settings" -Method Post -Body '{"action":"get"}' -ContentType "application/json"
-    Write-Host "Current Cache Size: $([math]::Round($current.CacheSize / 1MB)) MB" -ForegroundColor Yellow
-    Write-Host "Preload Percentage: $($current.PreloadCache)%" -ForegroundColor Yellow
-    Write-Host "Use Disk: $($current.UseDisk)" -ForegroundColor Yellow
+    $current = Invoke-RestMethod -Uri $settingsUrl -Method Post -Body '{"action":"get"}' -ContentType 'application/json' -TimeoutSec 10
+    if ($null -eq $current -or $null -eq $current.CacheSize -or $null -eq $current.PreloadCache) {
+        throw 'TorrServer returned an incomplete settings object.'
+    }
+
+    $desired = [ordered]@{
+        CacheSize = 80MB
+        ReaderReadAHead = 95
+        PreloadCache = 25
+        UseDisk = $false
+        RemoveCacheOnDrop = $true
+        ConnectionsLimit = 30
+        ResponsiveMode = $true
+    }
+    $changes = @($desired.Keys | Where-Object { $current.$_ -ne $desired[$_] })
+    if ($changes.Count -eq 0) {
+        Write-Host 'TorrServer cache settings already match; no session restart needed.'
+        return
+    }
+
+    New-Item -ItemType Directory -Path $BackupDirectory -Force | Out-Null
+    $backupPath = Join-Path $BackupDirectory ('torrserver-' + (Get-Date -Format 'yyyyMMdd-HHmmss') + '.json')
+    $current | ConvertTo-Json -Depth 30 | Set-Content -LiteralPath $backupPath -Encoding UTF8
+
+    foreach ($key in $desired.Keys) {
+        $current.$key = $desired[$key]
+    }
+    $payload = @{ action = 'set'; sets = $current } | ConvertTo-Json -Depth 30 -Compress
+    Invoke-RestMethod -Uri $settingsUrl -Method Post -Body $payload -ContentType 'application/json' -TimeoutSec 30 | Out-Null
+
+    $actual = Invoke-RestMethod -Uri $settingsUrl -Method Post -Body '{"action":"get"}' -ContentType 'application/json' -TimeoutSec 10
+    foreach ($key in $desired.Keys) {
+        if ($actual.$key -ne $desired[$key]) {
+            throw "Verification failed for $key. Original settings saved at $backupPath"
+        }
+    }
+    Write-Host "Updated $($changes -join ', '). Original settings: $backupPath"
 } catch {
-    Write-Error "Failed to update TorrServer settings: $_"
+    throw "TorrServer configuration failed: $_"
 }
