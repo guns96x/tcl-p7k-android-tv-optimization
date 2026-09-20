@@ -1,25 +1,9 @@
 @echo off
-chcp 65001 >nul
-title Setup Remote Access (SSH / WinRM)
+setlocal
 cd /d "%~dp0"
+title Remote Access Setup
 
-:: Check for Administrative privileges and elevate if needed
-net session >nul 2>&1
-if %errorLevel% neq 0 (
-    echo Запит прав Адміністратора...
-    powershell -Command "Start-Process cmd.exe -ArgumentList '/c \"\"%~f0\"\"' -Verb RunAs"
-    exit /b
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "& {Start-Process powershell.exe -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File ""%~dp0enable-remote-access.ps1""' -Verb RunAs}"
+if %errorlevel% neq 0 (
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0enable-remote-access.ps1"
 )
-
-if exist "%~dp0scripts\enable-remote-access.ps1" (
-    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\enable-remote-access.ps1"
-) else (
-    if exist "%~dp0enable-remote-access.ps1" (
-        powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0enable-remote-access.ps1"
-    ) else (
-        echo [ПОМИЛКА] Файл enable-remote-access.ps1 не знайдено!
-    )
-)
-
-echo.
-pause
