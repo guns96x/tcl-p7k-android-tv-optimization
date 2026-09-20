@@ -93,8 +93,9 @@ restored `window_animation_scale` from a temporary `1.0` back to the snapshot
 value `0.5` and verified all recorded settings. TorrServer accepted the live
 change, remained reachable, and had local port 8090 connections afterward.
 The player was paused after the change; an ADB Play command resumed its
-MediaSession and refreshed the position near 45 minutes. Sustained playback
-and audio quality still require observation on the TV screen.
+MediaSession near 45 minutes. Its reported position then advanced from
+45:03 to 47:08 while the TorrServer process remained active. Picture and
+audio quality were not independently checked on the TV screen.
 No new 4K playback or before-and-after performance test was run here.
 
 TorrServer MatriX.141's [settings handler](https://github.com/YouROK/TorrServer/blob/MatriX.141/server/web/api/settings.go)
