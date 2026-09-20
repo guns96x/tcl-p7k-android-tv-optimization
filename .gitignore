@@ -1,0 +1,9 @@
+# Packages
+*.apk
+*.apks
+
+# Screenshots and temp
+*.png
+*.jpg
+*.tmp
+*.log
